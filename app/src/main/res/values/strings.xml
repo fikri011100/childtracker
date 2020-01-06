@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">RemotBayi</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tgl_kel">Tanggal Kelahiran : </string>
+    <string name="anak_ke"> | Anak Ke </string>
+    <string name="jenis_kel">Jenis Kelamin : </string>
+    <string name="rs_name">Rumah Sakit/Klinik : </string>
+    <string name="bidan_name">Nama Dokter/Bidan : Dr. </string>
+    <string name="metode_lahir">Metode Lahir : </string>
+    <string name="spinner_title">Pilih Anak </string>
+    <string name="caption_tumbuhkembang">Silahkan tekan tombol Tambah untuk menambahkan data tumbuh kembang. </string>
+
+    <string-array name="gender">
+        <item>Laki-laki</item>
+        <item>Perempuan</item>
+    </string-array>
+
+    <string-array name="metode_lahir">
+        <item>Normal</item>
+        <item>Caesar</item>
+    </string-array>
+
+</resources>

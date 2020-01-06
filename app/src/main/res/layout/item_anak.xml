@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cons_anak"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:background="@drawable/bg_red">
+
+    <TextView
+        android:id="@+id/text_tgl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/raleway_medium"
+        android:text="@string/tgl_kel"
+        app:layout_constraintLeft_toLeftOf="@+id/text_nama_anak"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_anakke"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/raleway_bold"
+        android:text="@string/anak_ke"
+        app:layout_constraintLeft_toRightOf="@+id/text_tgl"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_nama_anak"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/raleway_bold"
+        android:text="Dajjal"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_tgl" />
+
+    <TextView
+        android:id="@+id/text_jenis_kel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/raleway_medium"
+        android:text="@string/jenis_kel"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="@+id/text_nama_anak"
+        app:layout_constraintTop_toBottomOf="@id/text_nama_anak" />
+
+    <TextView
+        android:id="@+id/text_rs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/raleway_medium"
+        android:text="@string/rs_name"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="@+id/text_nama_anak"
+        app:layout_constraintTop_toBottomOf="@id/text_jenis_kel" />
+
+    <TextView
+        android:id="@+id/text_nama_dok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/raleway_medium"
+        android:text="@string/bidan_name"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="@+id/text_nama_anak"
+        app:layout_constraintTop_toBottomOf="@id/text_rs" />
+
+    <TextView
+        android:id="@+id/text_metode_lahir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="@font/raleway_medium"
+        android:text="@string/metode_lahir"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/text_nama_anak"
+        app:layout_constraintTop_toBottomOf="@id/text_nama_dok" />
+
+    <ImageView
+        android:id="@+id/img_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_create"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
