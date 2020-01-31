@@ -1,6 +1,7 @@
 package com.titi.remotbayi.tumbuhkembang;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.titi.remotbayi.MainActivity;
 import com.titi.remotbayi.R;
 import com.titi.remotbayi.model.ModelChild;
 import com.titi.remotbayi.sqlite.SqliteHandler;
@@ -120,7 +122,7 @@ public class AddTumbuhKembangActivity extends AppCompatActivity {
                 tglTumbuhKembang
         );
         Toast.makeText(this, "Berhasil Menambah Data Tumbuh Kembang", Toast.LENGTH_SHORT).show();
-        onBackPressed();
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
         finish();
     }
 }

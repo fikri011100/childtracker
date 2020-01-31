@@ -107,7 +107,7 @@
             android:drawablePadding="8dp"
             android:fontFamily="@font/raleway_semibold"
             android:hint="Berat Badan ( Kg )"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:textColor="@android:color/black"
             android:textColorHint="@color/colorTextCover" />
 
@@ -134,7 +134,7 @@
             android:drawablePadding="8dp"
             android:fontFamily="@font/raleway_semibold"
             android:hint="Tinggi Badan ( Cm )"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:textColor="@android:color/black"
             android:textColorHint="@color/colorTextCover" />
 
@@ -161,7 +161,7 @@
             android:drawablePadding="8dp"
             android:fontFamily="@font/raleway_semibold"
             android:hint="Suhu Tubuh ( C )"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:textColor="@android:color/black"
             android:textColorHint="@color/colorTextCover" />
 

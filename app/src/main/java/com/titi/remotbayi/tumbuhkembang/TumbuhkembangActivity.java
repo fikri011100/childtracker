@@ -3,6 +3,7 @@ package com.titi.remotbayi.tumbuhkembang;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -51,6 +52,8 @@ public class TumbuhkembangActivity extends AppCompatActivity {
     ConstraintLayout consTumbuhkembang;
     @BindView(R.id.spinner_child)
     Spinner spinnerChild;
+    @BindView(R.id.img_reload)
+    ImageView imgReload;
     SqliteHandler db;
     AnyChartView chartBb, chartTb, chartSuhuTubuh;
     Cursor cursor;
@@ -77,6 +80,10 @@ public class TumbuhkembangActivity extends AppCompatActivity {
 
             }
         });
+        imgReload.setOnClickListener(view -> {
+            datas.clear();
+            EventBus.getDefault().post(new BabyNameBus.EventBus(babyName));
+        });
     }
 
     private void showChart() {
@@ -88,7 +95,8 @@ public class TumbuhkembangActivity extends AppCompatActivity {
         APIlib.getInstance().setActiveAnyChartView(chartBb);
         Cartesian cartesian = AnyChart.column();
         for (int i = 0; i < datas.size(); i++) {
-            data.add(new ValueDataEntry(StringHelper.formatDate(datas.get(i).getTgl() + " 00:00:00"), Integer.parseInt(datas.get(i).getBb())));
+            data.add(new ValueDataEntry(StringHelper.formatDate(datas.get(i).getTgl() + " 00:00:00"), Float.parseFloat(datas.get(i).getBb())));
+            Log.d("asdas", String.valueOf(Float.parseFloat(datas.get(i).getBb())));
         }
 
         Column column = cartesian.column(data);
@@ -117,7 +125,8 @@ public class TumbuhkembangActivity extends AppCompatActivity {
         APIlib.getInstance().setActiveAnyChartView(chartTb);
         Cartesian cartesian1 = AnyChart.column();
         for (int i = 0; i < datas.size(); i++) {
-            data1.add(new ValueDataEntry(StringHelper.formatDate(datas.get(i).getTgl() + " 00:00:00"), Integer.parseInt(datas.get(i).getTb())));
+            data1.add(new ValueDataEntry(StringHelper.formatDate(datas.get(i).getTgl() + " 00:00:00"), Float.parseFloat(datas.get(i).getTb())));
+            Log.d("asdas", String.valueOf(Float.parseFloat(datas.get(i).getBb())));
         }
         Column column1 = cartesian1.column(data1);
 
@@ -146,7 +155,7 @@ public class TumbuhkembangActivity extends AppCompatActivity {
         APIlib.getInstance().setActiveAnyChartView(chartSuhuTubuh);
         Cartesian cartesian2 = AnyChart.column();
         for (int i = 0; i < datas.size(); i++) {
-            data2.add(new ValueDataEntry(StringHelper.formatDate(datas.get(i).getTgl() + " 00:00:00"), Integer.parseInt(datas.get(i).getSuhu())));
+            data2.add(new ValueDataEntry(StringHelper.formatDate(datas.get(i).getTgl() + " 00:00:00"), Float.parseFloat(datas.get(i).getSuhu())));
         }
         Column column2 = cartesian2.column(data2);
         column2.tooltip()

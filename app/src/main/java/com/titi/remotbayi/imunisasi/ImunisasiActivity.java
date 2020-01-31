@@ -1,23 +1,32 @@
 package com.titi.remotbayi.imunisasi;
 
+import android.Manifest;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.titi.remotbayi.R;
 import com.titi.remotbayi.model.ApiClient;
 import com.titi.remotbayi.model.ApiInterface;
+import com.titi.remotbayi.model.ModelChild;
 import com.titi.remotbayi.model.PojoSchedule;
 import com.titi.remotbayi.sqlite.SqliteHandler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,6 +34,8 @@ import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 
 public class ImunisasiActivity extends AppCompatActivity {
 
@@ -37,6 +48,15 @@ public class ImunisasiActivity extends AppCompatActivity {
     FloatingActionButton fabAdd;
     SqliteHandler db;
     HashMap<String, String> user;
+    @BindView(R.id.img_refresh_imunisasi)
+    ImageView imgRefreshImunisasi;
+    @BindView(R.id.cons_bwh)
+    ConstraintLayout consBwh;
+    @BindView(R.id.swipe)
+    SwipeRefreshLayout swipe;
+    final int callbackId = 42;
+    Cursor cursor;
+    protected List<ModelChild> data = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +71,55 @@ public class ImunisasiActivity extends AppCompatActivity {
             fabAdd.setVisibility(View.GONE);
         }
         getResponse();
-        fabAdd.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), AddImmunizationList.class)));
+        fabAdd.setOnClickListener(v -> {
+            Intent i = new Intent(getApplicationContext(), AddImmunizationList.class);
+            i.putExtra("id", "none");
+            i.putExtra("title", "none");
+            i.putExtra("desc", "none");
+            i.putExtra("time", "none");
+            i.putExtra("status", "add");
+            startActivity(i);
+        });
+        imgRefreshImunisasi.setOnClickListener(view -> getResponse());
+        swipe.setOnRefreshListener(() -> {
+            getResponse();
+            swipe.setRefreshing(false);
+            adapter.notifyDataSetChanged();
+        });
+        checkPermission(callbackId, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR);
+    }
+
+    private void checkPermission(int callbackId, String... permissionsId) {
+        boolean permissions = true;
+        for (String p : permissionsId) {
+            permissions = permissions && ContextCompat.checkSelfPermission(this, p) == PERMISSION_GRANTED;
+        }
+
+        if (!permissions)
+            ActivityCompat.requestPermissions(this, permissionsId, callbackId);
+    }
+
+    private void getDataSQLite() {
+        cursor = db.getBaby();
+
+        if (cursor.getCount() > 0) {
+            for (int i = 0; i < cursor.getCount(); i++) {
+                cursor.moveToNext();
+                ModelChild model = new ModelChild();
+                model.setId(cursor.getString(0));
+                model.setChildName(cursor.getString(1));
+                model.setAnakKe(cursor.getString(2));
+                model.setRSName(cursor.getString(3));
+                model.setBidanName(cursor.getString(4));
+                model.setKelaminChild(cursor.getString(5));
+                model.setUserIdChild(cursor.getString(6));
+                model.setMetodeLahir(cursor.getString(7));
+                model.setTglLahir(cursor.getString(8));
+                data.add(model);
+            }
+        }
+        cursor.close();
+        db.close();
     }
 
     private void getResponse() {
@@ -60,7 +128,13 @@ public class ImunisasiActivity extends AppCompatActivity {
         call.enqueue(new Callback<PojoSchedule>() {
             @Override
             public void onResponse(Call<PojoSchedule> call, Response<PojoSchedule> response) {
-                adapter = new AdapterImunisasi(getApplicationContext(), response.body().getSchedule());
+                if (data.size() == 0) {
+                    adapter = new AdapterImunisasi(getApplicationContext(), response.body().getSchedule(), user.get("name"), "", "");
+                } else {
+                    String tglLahir = data.get(0).getTglLahir();
+                    String rsName = data.get(0).getRSName();
+                    adapter = new AdapterImunisasi(getApplicationContext(), response.body().getSchedule(), user.get("name"), tglLahir, rsName);
+                }
                 recImunisasi.setHasFixedSize(true);
                 recImunisasi.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                 recImunisasi.setAdapter(adapter);
@@ -76,6 +150,8 @@ public class ImunisasiActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        data.clear();
+        getDataSQLite();
         getResponse();
     }
 

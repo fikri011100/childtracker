@@ -70,12 +70,12 @@ public class AddChildActivity extends AppCompatActivity {
         if (status.equals("edit")) {
             anakKe = getIntent().getStringExtra("anak_ke");
             baby = db.getBabyDetails(anakKe);
-            Toast.makeText(this, baby.get("id_bayi"), Toast.LENGTH_SHORT).show();
             edtBabyName.setText(baby.get("nama_bayi"));
             edtAnakKe.setText(baby.get("anak_ke"));
             edtRsName.setText(baby.get("rs_bayi"));
             edtDoctorName.setText(baby.get("nama_bidan"));
             edtTglLahir.setText(baby.get("tanggal_lahir_bayi"));
+            buttonAddChild.setText("Ubah Data Anak");
         }
         id = r.nextInt(9999 - 1111 + 1) - 1111;
         edtTglLahir.setOnClickListener(view -> {
@@ -87,9 +87,18 @@ public class AddChildActivity extends AppCompatActivity {
 
             DatePickerDialog datePickerDialog = new DatePickerDialog(this,
                     (view1, year, monthOfYear, dayOfMonth) -> {
+                        String day = dayOfMonth + "";
+                        String month = (monthOfYear + 1) + "";
+                        if (dayOfMonth < 10) {
+                            day = "0" + dayOfMonth;
+                        }
 
-                        edtTglLahir.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-                        tglLahir = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                        if ((monthOfYear + 1) < 10) {
+                            month = "0" + (monthOfYear + 1);
+                        }
+
+                        edtTglLahir.setText(day + "-" + month + "-" + year);
+                        tglLahir = year + "-" + month + "-" + day;
                     }, mYear, mMonth, mDay);
             datePickerDialog.show();
         });
@@ -124,7 +133,6 @@ public class AddChildActivity extends AppCompatActivity {
             }
         });
         buttonAddChild.setOnClickListener(view -> {
-            Toast.makeText(this, kelamin , Toast.LENGTH_LONG).show();
             if (status.equals("add")) {
                 db.addBayi(
                         id,

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RemotBayi</string>
+    <string name="app_name">Tumbuh Kembang</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -11,6 +11,7 @@
     <string name="metode_lahir">Metode Lahir : </string>
     <string name="spinner_title">Pilih Anak </string>
     <string name="caption_tumbuhkembang">Silahkan tekan tombol Tambah untuk menambahkan data tumbuh kembang. </string>
+    <string name="caption_about">Aplikasi ini memberikan panduan tentang tumbuh kembang pada balita. Jadi, masyarakat khususnya ibu-ibu akan lebih memahami tentang tumbuh kembang balita.</string>
 
     <string-array name="gender">
         <item>Laki-laki</item>
