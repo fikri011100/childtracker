@@ -52,30 +52,36 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.btn_login_in)
     public void onBtnLoginInClicked() {
-        if (edtEmailIn.getText().toString().equals("admin@admin.com")) {
-            db.addUser("1", "admin", "admin@admin.com");
-            sharedPref.setLogin(true);
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-            finish();
+        if (edtEmailIn.getText().toString().isEmpty() || edtPasswordIn.getText().toString().isEmpty()) {
+            Toast.makeText(this, "email atau password belum diisi", Toast.LENGTH_LONG).show();
         } else {
-            ApiInterface interfaces = ApiClient.getClient().create(ApiInterface.class);
-            Call<PojoLogin> call = interfaces.doLogin(edtEmailIn.getText().toString(), edtPasswordIn.getText().toString());
-            call.enqueue(new Callback<PojoLogin>() {
-                @Override
-                public void onResponse(Call<PojoLogin> call, Response<PojoLogin> response) {
-                    if (response.isSuccessful()) {
-                        db.addUser(response.body().getUser().get(0).getUserId(), response.body().getUser().get(0).getUsername(), response.body().getUser().get(0).getEmail());
-                        sharedPref.setLogin(true);
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        finish();
+            if (edtEmailIn.getText().toString().equals("admin@admin.com")) {
+                db.addUser("1", "admin", "admin@admin.com");
+                sharedPref.setLogin(true);
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                finish();
+            } else {
+                ApiInterface interfaces = ApiClient.getClient().create(ApiInterface.class);
+                Call<PojoLogin> call = interfaces.doLogin(edtEmailIn.getText().toString(), edtPasswordIn.getText().toString());
+                call.enqueue(new Callback<PojoLogin>() {
+                    @Override
+                    public void onResponse(Call<PojoLogin> call, Response<PojoLogin> response) {
+                        if (response.body().getResult() == true) {
+                            db.addUser(response.body().getUser().get(0).getUserId(), response.body().getUser().get(0).getUsername(), response.body().getUser().get(0).getEmail());
+                            sharedPref.setLogin(true);
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            finish();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Maaf, username atau password salah", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
 
-                @Override
-                public void onFailure(Call<PojoLogin> call, Throwable t) {
-                    Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void onFailure(Call<PojoLogin> call, Throwable t) {
+                        Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         }
     }
 

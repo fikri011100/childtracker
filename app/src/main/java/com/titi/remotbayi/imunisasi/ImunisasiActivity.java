@@ -1,6 +1,5 @@
 package com.titi.remotbayi.imunisasi;
 
-import android.Manifest;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -10,8 +9,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -35,8 +32,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
-
 public class ImunisasiActivity extends AppCompatActivity {
 
     @BindView(R.id.rec_imunisasi)
@@ -54,7 +49,6 @@ public class ImunisasiActivity extends AppCompatActivity {
     ConstraintLayout consBwh;
     @BindView(R.id.swipe)
     SwipeRefreshLayout swipe;
-    final int callbackId = 42;
     Cursor cursor;
     protected List<ModelChild> data = new ArrayList<>();
 
@@ -86,18 +80,9 @@ public class ImunisasiActivity extends AppCompatActivity {
             swipe.setRefreshing(false);
             adapter.notifyDataSetChanged();
         });
-        checkPermission(callbackId, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR);
     }
 
-    private void checkPermission(int callbackId, String... permissionsId) {
-        boolean permissions = true;
-        for (String p : permissionsId) {
-            permissions = permissions && ContextCompat.checkSelfPermission(this, p) == PERMISSION_GRANTED;
-        }
 
-        if (!permissions)
-            ActivityCompat.requestPermissions(this, permissionsId, callbackId);
-    }
 
     private void getDataSQLite() {
         cursor = db.getBaby();
@@ -129,11 +114,11 @@ public class ImunisasiActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<PojoSchedule> call, Response<PojoSchedule> response) {
                 if (data.size() == 0) {
-                    adapter = new AdapterImunisasi(getApplicationContext(), response.body().getSchedule(), user.get("name"), "", "");
+                    adapter = new AdapterImunisasi(getApplicationContext(), response.body().getSchedule(), "", "", user.get("name"));
                 } else {
                     String tglLahir = data.get(0).getTglLahir();
                     String rsName = data.get(0).getRSName();
-                    adapter = new AdapterImunisasi(getApplicationContext(), response.body().getSchedule(), user.get("name"), tglLahir, rsName);
+                    adapter = new AdapterImunisasi(getApplicationContext(), response.body().getSchedule(), rsName, tglLahir, user.get("name"));
                 }
                 recImunisasi.setHasFixedSize(true);
                 recImunisasi.setLayoutManager(new LinearLayoutManager(getApplicationContext()));

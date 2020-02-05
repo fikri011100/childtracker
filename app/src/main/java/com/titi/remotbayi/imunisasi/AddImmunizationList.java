@@ -1,9 +1,10 @@
 package com.titi.remotbayi.imunisasi;
 
 import android.os.Bundle;
-import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,6 +44,8 @@ public class AddImmunizationList extends AppCompatActivity {
     String id, idTemp, status, title, desc, time;
     @BindView(R.id.button_add_immunization)
     Button buttonAddImmunization;
+    @BindView(R.id.txt_atas)
+    TextView txtAtas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +61,11 @@ public class AddImmunizationList extends AppCompatActivity {
         desc = getIntent().getStringExtra("desc");
         time = getIntent().getStringExtra("time");
         if (status.equals("edit")) {
+            txtAtas.setText("Edit List Imunisasi");
             edtTitle.setText(title);
             edtDesc.setText(desc);
             edtTime.setText(time);
+            buttonAddImmunization.setText("Edit Data Imunisasi");
         }
         imgBackCreate.setOnClickListener(view -> onBackPressed());
     }

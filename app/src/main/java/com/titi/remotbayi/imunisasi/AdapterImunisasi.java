@@ -58,16 +58,12 @@ class AdapterImunisasi extends RecyclerView.Adapter<AdapterImunisasi.ViewHolder>
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             i.putExtra("title", schedule.get(position).getScheduleTitle());
             i.putExtra("status", "add");
+            i.putExtra("desc", schedule.get(position).getScheduleDesc());
+            i.putExtra("rsname", rsName);
             context.startActivity(i);
         });
         holder.bgMain.setOnClickListener(view -> {
-            if (!name.equals("admin")) {
-                Intent i = new Intent(context, DetailImmunization.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.putExtra("title", schedule.get(position).getScheduleTitle());
-                i.putExtra("desc", schedule.get(position).getScheduleDesc());
-                context.startActivity(i);
-            } else {
+            if (name.equals("admin")) {
                 Intent i = new Intent(context, AddImmunizationList.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 i.putExtra("id", schedule.get(position).getScheduleId());
@@ -75,6 +71,12 @@ class AdapterImunisasi extends RecyclerView.Adapter<AdapterImunisasi.ViewHolder>
                 i.putExtra("desc", schedule.get(position).getScheduleDesc());
                 i.putExtra("time", schedule.get(position).getScheduleTime());
                 i.putExtra("status", "edit");
+                context.startActivity(i);
+            } else {
+                Intent i = new Intent(context, DetailImmunization.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.putExtra("title", schedule.get(position).getScheduleTitle());
+                i.putExtra("desc", schedule.get(position).getScheduleDesc());
                 context.startActivity(i);
             }
         });
