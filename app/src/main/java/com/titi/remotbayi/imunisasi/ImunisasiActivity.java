@@ -123,6 +123,7 @@ public class ImunisasiActivity extends AppCompatActivity {
                 recImunisasi.setHasFixedSize(true);
                 recImunisasi.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                 recImunisasi.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
             }
 
             @Override

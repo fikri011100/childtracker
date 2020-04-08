@@ -9,7 +9,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
-    private static final String BASE_URL = "http://3.112.241.185/childtracker/";
+    private static final String BASE_URL = "http://fikri.akudeveloper.com/";
     private static Retrofit retrofit = null;
     public static String IMG_LOCAL_IMUNISASI = Environment.getExternalStorageDirectory().getAbsolutePath()+"/ChildTracker/Pictures/";
 

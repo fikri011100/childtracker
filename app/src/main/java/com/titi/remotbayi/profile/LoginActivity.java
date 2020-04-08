@@ -55,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         if (edtEmailIn.getText().toString().isEmpty() || edtPasswordIn.getText().toString().isEmpty()) {
             Toast.makeText(this, "email atau password belum diisi", Toast.LENGTH_LONG).show();
         } else {
-            if (edtEmailIn.getText().toString().equals("admin@admin.com")) {
+            if (edtEmailIn.getText().toString().equals("admin@admin.com") && edtPasswordIn.getText().toString().equals("admin")) {
                 db.addUser("1", "admin", "admin@admin.com");
                 sharedPref.setLogin(true);
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));

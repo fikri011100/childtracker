@@ -1,7 +1,7 @@
 package com.titi.remotbayi.imunisasi;
 
 import android.os.Bundle;
-import android.view.inputmethod.EditorInfo;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,6 +17,7 @@ import com.titi.remotbayi.model.ApiInterface;
 import com.titi.remotbayi.model.PojoEditSchedule;
 import com.titi.remotbayi.model.PojoRegister;
 import com.titi.remotbayi.sqlite.SqliteHandler;
+import com.titi.remotbayi.utils.GeneralDoubleButtonDialog;
 
 import java.util.Random;
 
@@ -39,6 +40,8 @@ public class AddImmunizationList extends AppCompatActivity {
     TextInputEditText edtTime;
     @BindView(R.id.ly_time)
     TextInputLayout lyTime;
+    @BindView(R.id.img_delete)
+    ImageView imgDelete;
     SqliteHandler db;
     Random r;
     String id, idTemp, status, title, desc, time;
@@ -46,6 +49,7 @@ public class AddImmunizationList extends AppCompatActivity {
     Button buttonAddImmunization;
     @BindView(R.id.txt_atas)
     TextView txtAtas;
+    GeneralDoubleButtonDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +66,16 @@ public class AddImmunizationList extends AppCompatActivity {
         time = getIntent().getStringExtra("time");
         if (status.equals("edit")) {
             txtAtas.setText("Edit List Imunisasi");
+            imgDelete.setVisibility(View.VISIBLE);
             edtTitle.setText(title);
             edtDesc.setText(desc);
             edtTime.setText(time);
             buttonAddImmunization.setText("Edit Data Imunisasi");
         }
         imgBackCreate.setOnClickListener(view -> onBackPressed());
+        imgDelete.setOnClickListener(view -> {
+            deleteImmunization();
+        });
     }
 
     @OnClick(R.id.button_add_immunization)
@@ -109,5 +117,36 @@ public class AddImmunizationList extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void deleteImmunization() {
+        dialog = new GeneralDoubleButtonDialog.GeneralDoubleDialogBuilder(AddImmunizationList.this)
+                .setCaption("Apakah anda yakin ingin menghapus jadwal ini?")
+                .setYesButton("Hapus")
+                .setCancelButton("Batal")
+                .setOnActionDialog(new GeneralDoubleButtonDialog.OnActionDialog() {
+                    @Override
+                    public void onYesClickListener() {
+                        ApiInterface interfaces = ApiClient.getClient().create(ApiInterface.class);
+                        Call<PojoEditSchedule> call = interfaces.deleteSchedule(idTemp);
+                        call.enqueue(new Callback<PojoEditSchedule>() {
+                            @Override
+                            public void onResponse(Call<PojoEditSchedule> call, Response<PojoEditSchedule> response) {
+                                onBackPressed();
+                                finish();
+                            }
+                            @Override
+                            public void onFailure(Call<PojoEditSchedule> call, Throwable t) {
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                })
+                .build();
     }
 }

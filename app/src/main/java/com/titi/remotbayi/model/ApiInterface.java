@@ -29,4 +29,8 @@ public interface ApiInterface {
     @POST("editDataImmunization.php")
     Call<PojoEditSchedule> editSchedule(@Field("schedule_id") String id, @Field("schedule_title") String title,
                                    @Field("schedule_desc") String desc, @Field("schedule_time") String time);
+
+    @FormUrlEncoded
+    @POST("deleteImmunization.php")
+    Call<PojoEditSchedule> deleteSchedule(@Field("schedule_id") String id);
 }
