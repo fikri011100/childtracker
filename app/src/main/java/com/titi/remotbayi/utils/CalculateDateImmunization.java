@@ -1,8 +1,5 @@
 package com.titi.remotbayi.utils;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 public class CalculateDateImmunization {
 
     public static String formatDate(int date) {
@@ -63,7 +60,7 @@ public class CalculateDateImmunization {
         String date;
         int month, year, monthMin, yearPlus, day;
         String m, d;
-        month = Integer.parseInt(tglLahir.substring(6, 7));
+        month = Integer.parseInt(tglLahir.substring(5, 7));
         year = Integer.parseInt(tglLahir.substring(0, 4));
         day = Integer.parseInt(tglLahir.substring(tglLahir.length() - 2));
         month = month + bulan + 1;

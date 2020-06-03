@@ -12,6 +12,10 @@ public interface ApiInterface {
     Call<PojoSchedule> getSchedule();
 
     @FormUrlEncoded
+    @POST("addDetailApp.php")
+    Call<PojoEditSchedule> editDetail(@Field("title") String title);
+
+    @FormUrlEncoded
     @POST("userLogin.php")
     Call<PojoLogin> doLogin(@Field("email") String str_email, @Field("password") String str_password);
 

@@ -2,7 +2,6 @@ package com.titi.remotbayi.tumbuhkembang;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,6 +23,7 @@ import com.titi.remotbayi.sqlite.SqliteHandler;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -54,6 +54,9 @@ public class AddTumbuhKembangActivity extends AppCompatActivity {
     SqliteHandler db;
     Random r;
     String id, tglTumbuhKembang;
+    HashMap<String, String> user;
+    @BindView(R.id.cons_user)
+    ConstraintLayout consUser;
     private String babyName = "";
     private int mYear, mMonth, mDay;
     protected List<ModelChild> data = new ArrayList<>();
@@ -64,6 +67,7 @@ public class AddTumbuhKembangActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_tumbuh_kembang);
         ButterKnife.bind(this);
         db = new SqliteHandler(this);
+        user = db.getUserDetails();
         r = new Random();
         id = String.valueOf(r.nextInt(9999 - 1111 + 1) - 1111);
         loadSpinnerData();

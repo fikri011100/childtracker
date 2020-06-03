@@ -19,7 +19,7 @@ public class SqliteHandler extends SQLiteOpenHelper {
 
     private static final String TAG = SqliteHandler.class.getSimpleName();
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "bayi";
 
     //USER
@@ -57,6 +57,14 @@ public class SqliteHandler extends SQLiteOpenHelper {
     public static final String KEY_BB_TUMBUHKEMBANG = "bb_tumbuhkembang";
     public static final String KEY_TB_TUMBUHKEMBANG = "tb_tumbuhkembang";
     public static final String KEY_SUHU_TUBUH_TUMBUHKEMBANG = "suhutubuh_tumbuhkembang";
+
+    //STANDART CHART IMUNISASI
+    public static final String TABLE_STANDARTCHART = "standartchart";
+    public static final String KEY_ID_STANDARTCHART = "id_standartchart";
+    public static final String KEY_TGL_STANDARTCHART = "tgl_standartchart";
+    public static final String KEY_BB_STANDARTCHART = "bb_standartchart";
+    public static final String KEY_TB_STANDARTCHART = "tb_standartchart";
+    public static final String KEY_ST_STANDARTCHART = "st_standartchart";
 
     public SqliteHandler(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -103,6 +111,15 @@ public class SqliteHandler extends SQLiteOpenHelper {
                 + KEY_SUHU_TUBUH_TUMBUHKEMBANG + " TEXT"
                 + ")";
         db.execSQL(CREATE_TUMBUHKEMBANG_TABLE);
+
+        String CREATE_STANDARTCHART_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_STANDARTCHART + "("
+                + KEY_ID_STANDARTCHART + " INTEGER PRIMARY KEY ,"
+                + KEY_TGL_STANDARTCHART + " TEXT,"
+                + KEY_BB_STANDARTCHART + " TEXT,"
+                + KEY_TB_STANDARTCHART + " TEXT,"
+                + KEY_ST_STANDARTCHART + " TEXT"
+                + ")";
+        db.execSQL(CREATE_STANDARTCHART_TABLE);
     }
 
     @Override
@@ -111,7 +128,43 @@ public class SqliteHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BAYI);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_IMUNISASI);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TUMBUHKEMBANG);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_STANDARTCHART);
         onCreate(db);
+    }
+
+    public void addStandartChart(String id_s, String tgl, String bb, String tb, String st) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID_STANDARTCHART, id_s);
+        values.put(KEY_TGL_STANDARTCHART, tgl);
+        values.put(KEY_BB_STANDARTCHART, bb);
+        values.put(KEY_TB_STANDARTCHART, tb);
+        values.put(KEY_ST_STANDARTCHART, st);
+
+        long id = db.insert(TABLE_STANDARTCHART, null, values);
+        db.close();
+        Log.d("tes", "New standart chart inserted into sqlite: " + id);
+    }
+
+    public HashMap<String, String> getStandartChart() {
+        HashMap<String, String> user = new HashMap<>();
+        String selectQuery = "SELECT  * FROM " + TABLE_STANDARTCHART;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            user.put("tgl", cursor.getString(1));
+            user.put("bb", cursor.getString(2));
+            user.put("tb", cursor.getString(2));
+            user.put("st", cursor.getString(2));
+        }
+        cursor.close();
+        db.close();
+
+        return user;
     }
 
     public void addUser(String id_u,String name, String email) {
@@ -124,7 +177,7 @@ public class SqliteHandler extends SQLiteOpenHelper {
 
         long id = db.insert(TABLE_USER, null, values);
         db.close();
-//        Logger.d( "New user inserted into sqlite: " + id);
+        Log.d("tes", "New user inserted into sqlite: " + id);
     }
 
     public HashMap<String, String> getUserDetails() {

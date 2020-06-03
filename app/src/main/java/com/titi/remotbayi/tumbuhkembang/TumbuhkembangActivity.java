@@ -1,5 +1,6 @@
 package com.titi.remotbayi.tumbuhkembang;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -10,32 +11,41 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.anychart.APIlib;
 import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
 import com.anychart.chart.common.dataentry.DataEntry;
-import com.anychart.chart.common.dataentry.ValueDataEntry;
 import com.anychart.charts.Cartesian;
-import com.anychart.core.cartesian.series.Column;
-import com.anychart.enums.Anchor;
+import com.anychart.core.cartesian.series.RangeColumn;
+import com.anychart.data.Mapping;
+import com.anychart.data.Set;
 import com.anychart.enums.HoverMode;
-import com.anychart.enums.Position;
 import com.anychart.enums.TooltipPositionMode;
 import com.titi.remotbayi.R;
 import com.titi.remotbayi.eventbus.BabyNameBus;
+import com.titi.remotbayi.model.ModelChild;
+import com.titi.remotbayi.model.ModelStandartTumbuhKembang;
 import com.titi.remotbayi.model.ModelTumbuhkembang;
 import com.titi.remotbayi.sqlite.SqliteHandler;
 import com.titi.remotbayi.utils.StringHelper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -59,6 +69,11 @@ public class TumbuhkembangActivity extends AppCompatActivity {
     Cursor cursor;
     String babyName = "";
     protected List<ModelTumbuhkembang> datas = new ArrayList<>();
+    protected List<ModelChild> data = new ArrayList<>();
+    protected List<ModelStandartTumbuhKembang> dataStandart = new ArrayList<>();
+    private RequestQueue requestQueue;
+    private StringRequest stringRequest;
+    public String url = "http://fikri.akudeveloper.com/getImmunization.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +82,7 @@ public class TumbuhkembangActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         db = new SqliteHandler(this);
         loadSpinnerData();
+        getResponse();
 
         spinnerChild.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -86,6 +102,16 @@ public class TumbuhkembangActivity extends AppCompatActivity {
         });
     }
 
+    private class CustomDataEntry extends DataEntry {
+        public CustomDataEntry(String x, Number edinburgHigh, Number edinburgLow, Number londonHigh, Number londonLow) {
+            setValue("x", x);
+            setValue("edinburgHigh", edinburgHigh);
+            setValue("edinburgLow", edinburgLow);
+            setValue("londonHigh", londonHigh);
+            setValue("londonLow", londonLow);
+        }
+    }
+
     private void showChart() {
         List<DataEntry> data = new ArrayList<>();
         List<DataEntry> data1 = new ArrayList<>();
@@ -93,21 +119,23 @@ public class TumbuhkembangActivity extends AppCompatActivity {
         //chart 1
         chartBb = findViewById(R.id.chart_bb);
         APIlib.getInstance().setActiveAnyChartView(chartBb);
-        Cartesian cartesian = AnyChart.column();
+        Cartesian cartesian = AnyChart.cartesian();
+
         for (int i = 0; i < datas.size(); i++) {
-            data.add(new ValueDataEntry(StringHelper.formatDate(datas.get(i).getTgl() + " 00:00:00"), Float.parseFloat(datas.get(i).getBb())));
+            data.add(new CustomDataEntry(StringHelper.formatDate(datas.get(i).getTgl() + " 00:00:00"), Float.parseFloat(datas.get(i).getBb()), 0, Float.parseFloat(dataStandart.get(i).getBb()), 0));
             Log.d("asdas", String.valueOf(Float.parseFloat(datas.get(i).getBb())));
         }
 
-        Column column = cartesian.column(data);
+        Set set = Set.instantiate();
+        set.data(data);
+        Mapping londonData = set.mapAs("{ x: 'x', high: 'londonHigh', low: 'londonLow' }");
+        Mapping edinburgData = set.mapAs("{ x: 'x', high: 'edinburgHigh', low: 'edinburgLow' }");
 
-        column.tooltip()
-                .titleFormat("{%X}")
-                .position(Position.CENTER_BOTTOM)
-                .anchor(Anchor.CENTER_BOTTOM)
-                .offsetX(0d)
-                .offsetY(5d)
-                .format("{%Value}{groupsSeparator: }");
+        RangeColumn columnLondon = cartesian.rangeColumn(londonData);
+        columnLondon.name("Bayi");
+
+        RangeColumn columnEdinburg = cartesian.rangeColumn(edinburgData);
+        columnEdinburg.name("Standar");
 
         cartesian.animation(true);
         cartesian.title("Berat Badan (FW)");
@@ -118,25 +146,36 @@ public class TumbuhkembangActivity extends AppCompatActivity {
 
         cartesian.tooltip().positionMode(TooltipPositionMode.POINT);
         cartesian.interactivity().hoverMode(HoverMode.BY_X);
+        cartesian.xAxis(true);
+        cartesian.yAxis(true);
+
+        cartesian.legend(true);
+
+        cartesian.yGrid(true)
+                .yMinorGrid(true);
+
+        cartesian.tooltip().titleFormat("{%SeriesName} ({%x})");
 
         chartBb.setChart(cartesian);
         //chart 2
         chartTb = findViewById(R.id.chart_tb);
         APIlib.getInstance().setActiveAnyChartView(chartTb);
-        Cartesian cartesian1 = AnyChart.column();
+        Cartesian cartesian1 = AnyChart.cartesian();
+
         for (int i = 0; i < datas.size(); i++) {
-            data1.add(new ValueDataEntry(StringHelper.formatDate(datas.get(i).getTgl() + " 00:00:00"), Float.parseFloat(datas.get(i).getTb())));
+            data1.add(new CustomDataEntry(StringHelper.formatDate(datas.get(i).getTgl() + " 00:00:00"), Float.parseFloat(datas.get(i).getTb()), 0, Float.parseFloat(dataStandart.get(i).getTb()), 0));
             Log.d("asdas", String.valueOf(Float.parseFloat(datas.get(i).getBb())));
         }
-        Column column1 = cartesian1.column(data1);
+        Set set1 = Set.instantiate();
+        set1.data(data1);
+        Mapping londonData1 = set1.mapAs("{ x: 'x', high: 'londonHigh', low: 'londonLow' }");
+        Mapping edinburgData1 = set1.mapAs("{ x: 'x', high: 'edinburgHigh', low: 'edinburgLow' }");
 
-        column1.tooltip()
-                .titleFormat("{%X}")
-                .position(Position.CENTER_BOTTOM)
-                .anchor(Anchor.CENTER_BOTTOM)
-                .offsetX(0d)
-                .offsetY(5d)
-                .format("{%Value}{groupsSeparator: }");
+        RangeColumn columnLondon1 = cartesian1.rangeColumn(londonData1);
+        columnLondon1.name("Bayi");
+
+        RangeColumn columnEdinburg1 = cartesian1.rangeColumn(edinburgData1);
+        columnEdinburg1.name("Standar");
 
         cartesian1.animation(true);
         cartesian1.title("Tinggi Badan (FW)");
@@ -147,6 +186,15 @@ public class TumbuhkembangActivity extends AppCompatActivity {
 
         cartesian1.tooltip().positionMode(TooltipPositionMode.POINT);
         cartesian1.interactivity().hoverMode(HoverMode.BY_X);
+        cartesian1.xAxis(true);
+        cartesian1.yAxis(true);
+
+        cartesian1.legend(true);
+
+        cartesian1.yGrid(true)
+                .yMinorGrid(true);
+
+        cartesian1.tooltip().titleFormat("{%SeriesName} ({%x})");
 
         chartTb.setChart(cartesian1);
 
@@ -155,16 +203,18 @@ public class TumbuhkembangActivity extends AppCompatActivity {
         APIlib.getInstance().setActiveAnyChartView(chartSuhuTubuh);
         Cartesian cartesian2 = AnyChart.column();
         for (int i = 0; i < datas.size(); i++) {
-            data2.add(new ValueDataEntry(StringHelper.formatDate(datas.get(i).getTgl() + " 00:00:00"), Float.parseFloat(datas.get(i).getSuhu())));
+            data2.add(new CustomDataEntry(StringHelper.formatDate(datas.get(i).getTgl() + " 00:00:00"), Float.parseFloat(datas.get(i).getSuhu()),0,Float.parseFloat(dataStandart.get(i).getSt()),0));
         }
-        Column column2 = cartesian2.column(data2);
-        column2.tooltip()
-                .titleFormat("{%X}")
-                .position(Position.CENTER_BOTTOM)
-                .anchor(Anchor.CENTER_BOTTOM)
-                .offsetX(0d)
-                .offsetY(5d)
-                .format("{%Value}{groupsSeparator: }");
+        Set set2 = Set.instantiate();
+        set2.data(data2);
+        Mapping londonData2 = set2.mapAs("{ x: 'x', high: 'londonHigh', low: 'londonLow' }");
+        Mapping edinburgData2 = set2.mapAs("{ x: 'x', high: 'edinburgHigh', low: 'edinburgLow' }");
+
+        RangeColumn columnLondon2 = cartesian2.rangeColumn(londonData2);
+        columnLondon2.name("Bayi");
+
+        RangeColumn columnEdinburg2 = cartesian2.rangeColumn(edinburgData2);
+        columnEdinburg2.name("Standar");
 
         cartesian2.animation(true);
         cartesian2.title("Suhu Tubuh (FW)");
@@ -175,6 +225,15 @@ public class TumbuhkembangActivity extends AppCompatActivity {
 
         cartesian2.tooltip().positionMode(TooltipPositionMode.POINT);
         cartesian2.interactivity().hoverMode(HoverMode.BY_X);
+        cartesian2.xAxis(true);
+        cartesian2.yAxis(true);
+
+        cartesian2.legend(true);
+
+        cartesian2.yGrid(true)
+                .yMinorGrid(true);
+
+        cartesian2.tooltip().titleFormat("{%SeriesName} ({%x})");
 
         chartSuhuTubuh.setChart(cartesian2);
     }
@@ -214,6 +273,44 @@ public class TumbuhkembangActivity extends AppCompatActivity {
                 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerChild.setAdapter(dataAdapter);
         db.close();
+    }
+
+    private void getResponse() {
+        final ProgressDialog progres = new ProgressDialog(this);
+        progres.setTitle("Mohon tunggu sebentar");
+        progres.setMessage("Sedang Ambil Data");
+        progres.show();
+        requestQueue = Volley.newRequestQueue(TumbuhkembangActivity.this);
+        stringRequest = new StringRequest(Request.Method.POST, url, new com.android.volley.Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                progres.dismiss();
+                Log.d("response ", response);
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("schedule");
+                    for (int a = 0; a < jsonArray.length(); a++) {
+                        JSONObject json = jsonArray.getJSONObject(a);
+                        HashMap<String, String> map = new HashMap<String, String>();
+                        map.put("schedule_id", json.getString("schedule_id"));
+                        map.put("schedule_title", json.getString("schedule_title"));
+                        map.put("schedule_desc", json.getString("schedule_desc"));
+                        map.put("schedule_time", json.getString("schedule_time"));
+                        map.put("bb_standart", json.getString("bb_standart"));
+                        map.put("tb_standart", json.getString("tb_standart"));
+                        map.put("st_standart", json.getString("st_standart"));
+                        ModelStandartTumbuhKembang model = new ModelStandartTumbuhKembang();
+                        model.setBb(json.getString("bb_standart"));
+                        model.setTb(json.getString("tb_standart"));
+                        model.setSt(json.getString("st_standart"));
+                        dataStandart.add(model);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }}, error -> {
+        });
+        requestQueue.add(stringRequest);
     }
 
     @OnClick(R.id.img_back_create)

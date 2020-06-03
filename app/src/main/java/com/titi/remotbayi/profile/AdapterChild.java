@@ -45,7 +45,6 @@ public class AdapterChild extends RecyclerView.Adapter<AdapterChild.ViewHolder> 
         holder.textTgl.setText(context.getString(R.string.tgl_kel) + " " + StringHelper.formatDate(data.get(position).getTglLahir() + " 00:00:00"));
         holder.textAnakke.setText(context.getString(R.string.anak_ke) + " " + data.get(position).getAnakKe());
         holder.textJenisKel.setText(context.getString(R.string.jenis_kel) + " " + data.get(position).getKelaminChild());
-        holder.textRs.setText(context.getString(R.string.rs_name) + " " + data.get(position).getRSName());
         holder.textNamaDok.setText(context.getString(R.string.bidan_name) + " " + data.get(position).getBidanName());
         holder.textMetodeLahir.setText(context.getString(R.string.metode_lahir) + " " + data.get(position).getMetodeLahir());
         holder.imgEdit.setOnClickListener(v -> {
@@ -71,8 +70,6 @@ public class AdapterChild extends RecyclerView.Adapter<AdapterChild.ViewHolder> 
         TextView textNamaAnak;
         @BindView(R.id.text_jenis_kel)
         TextView textJenisKel;
-        @BindView(R.id.text_rs)
-        TextView textRs;
         @BindView(R.id.text_nama_dok)
         TextView textNamaDok;
         @BindView(R.id.text_metode_lahir)

@@ -83,33 +83,6 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/ly_rs_name"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginRight="24dp"
-        app:hintEnabled="true"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ly_anak_ke">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edt_rs_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="24dp"
-            android:drawablePadding="8dp"
-            android:fontFamily="@font/raleway_semibold"
-            android:hint="Nama Rumah Sakit"
-            android:inputType="text"
-            android:textColor="@android:color/black"
-            android:textColorHint="@color/colorTextCover" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/ly_doctor_name"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
@@ -120,7 +93,7 @@
         app:hintEnabled="true"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ly_rs_name">
+        app:layout_constraintTop_toBottomOf="@id/ly_anak_ke">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_doctor_name"
@@ -226,6 +199,29 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/text_caption_add_calendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="28dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="@font/raleway_medium"
+        android:text="Tambahkan jadwal imunisasi otomatis"
+        android:textColor="@android:color/black"
+        android:textSize="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ly_tgl_lahir" />
+
+    <Switch
+        android:id="@+id/switch_calendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toRightOf="@+id/text_caption_add_calendar"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ly_tgl_lahir"/>
 
     <Button
         android:id="@+id/button_add_child"

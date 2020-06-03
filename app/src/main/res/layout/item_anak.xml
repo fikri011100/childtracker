@@ -52,16 +52,6 @@
         app:layout_constraintTop_toBottomOf="@id/text_nama_anak" />
 
     <TextView
-        android:id="@+id/text_rs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/raleway_medium"
-        android:text="@string/rs_name"
-        android:textSize="16sp"
-        app:layout_constraintLeft_toLeftOf="@+id/text_nama_anak"
-        app:layout_constraintTop_toBottomOf="@id/text_jenis_kel" />
-
-    <TextView
         android:id="@+id/text_nama_dok"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -69,7 +59,7 @@
         android:text="@string/bidan_name"
         android:textSize="16sp"
         app:layout_constraintLeft_toLeftOf="@+id/text_nama_anak"
-        app:layout_constraintTop_toBottomOf="@id/text_rs" />
+        app:layout_constraintTop_toBottomOf="@id/text_jenis_kel" />
 
     <TextView
         android:id="@+id/text_metode_lahir"

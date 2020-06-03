@@ -17,13 +17,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.titi.remotbayi.R;
 import com.titi.remotbayi.immunization.AddImunisasiActivity;
-import com.titi.remotbayi.model.Schedule;
 import com.titi.remotbayi.utils.CalculateDateImmunization;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 import java.util.TimeZone;
 
 import butterknife.BindView;
@@ -32,12 +32,12 @@ import butterknife.ButterKnife;
 class AdapterImunisasi extends RecyclerView.Adapter<AdapterImunisasi.ViewHolder> {
 
     Context context;
-    List<Schedule> schedule;
+    ArrayList<HashMap<String, String>> list_dataa;
     String name, rsName, tglLahir;
 
-    public AdapterImunisasi(Context context, List<Schedule> schedule, String rsName, String tglLahir, String name) {
+    public AdapterImunisasi(Context context, ArrayList<HashMap<String, String>> list_dataa, String rsName, String tglLahir, String name) {
         this.context = context;
-        this.schedule = schedule;
+        this.list_dataa = list_dataa;
         this.name = name;
         this.rsName = rsName;
         this.tglLahir = tglLahir;
@@ -51,14 +51,14 @@ class AdapterImunisasi extends RecyclerView.Adapter<AdapterImunisasi.ViewHolder>
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.textTitle.setText(schedule.get(position).getScheduleTitle());
-        holder.textTime.setText(CalculateDateImmunization.formatDate(Integer.parseInt(schedule.get(position).getScheduleTime())));
+        holder.textTitle.setText(list_dataa.get(position).get("schedule_title"));
+        holder.textTime.setText(CalculateDateImmunization.formatDate(Integer.parseInt(list_dataa.get(position).get("schedule_time"))));
         holder.viewCatatImunisasi.setOnClickListener(v -> {
             Intent i = new Intent(context, AddImunisasiActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.putExtra("title", schedule.get(position).getScheduleTitle());
+            i.putExtra("title", list_dataa.get(position).get("schedule_title"));
             i.putExtra("status", "add");
-            i.putExtra("desc", schedule.get(position).getScheduleDesc());
+            i.putExtra("desc", list_dataa.get(position).get("schedule_desc"));
             i.putExtra("rsname", rsName);
             context.startActivity(i);
         });
@@ -66,46 +66,46 @@ class AdapterImunisasi extends RecyclerView.Adapter<AdapterImunisasi.ViewHolder>
             if (name.equals("admin")) {
                 Intent i = new Intent(context, AddImmunizationList.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.putExtra("id", schedule.get(position).getScheduleId());
-                i.putExtra("title", schedule.get(position).getScheduleTitle());
-                i.putExtra("desc", schedule.get(position).getScheduleDesc());
-                i.putExtra("time", schedule.get(position).getScheduleTime());
+                i.putExtra("id", list_dataa.get(position).get("schedule_id"));
+                i.putExtra("title", list_dataa.get(position).get("schedule_title"));
+                i.putExtra("desc", list_dataa.get(position).get("schedule_desc"));
+                i.putExtra("time", list_dataa.get(position).get("schedule_time"));
                 i.putExtra("status", "edit");
                 context.startActivity(i);
             } else {
                 Intent i = new Intent(context, DetailImmunization.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.putExtra("title", schedule.get(position).getScheduleTitle());
-                i.putExtra("desc", schedule.get(position).getScheduleDesc());
+                i.putExtra("title", list_dataa.get(position).get("schedule_title"));
+                i.putExtra("desc", list_dataa.get(position).get("schedule_desc"));
                 context.startActivity(i);
             }
         });
 
-        holder.viewRemindMe.setOnClickListener(view -> {
-            if (!name.equals("admin")) {
-                if (!rsName.equals("")) {
-                    holder.addCalendar(
-                            schedule.get(position).getScheduleTitle(),
-                            schedule.get(position).getScheduleDesc(),
-                            rsName,
-                            CalculateDateImmunization.startDate(Integer.parseInt(schedule.get(position).getScheduleTime()), tglLahir),
-                            CalculateDateImmunization.endDate(Integer.parseInt(schedule.get(position).getScheduleTime()), tglLahir)
-                    );
-                    Log.d("startDate", CalculateDateImmunization.startDate(Integer.parseInt(schedule.get(position).getScheduleTime()), tglLahir));
-                    Log.d("endDate", CalculateDateImmunization.endDate(Integer.parseInt(schedule.get(position).getScheduleTime()), tglLahir));
-                    Toast.makeText(context, "Jadwal Sudah Ditambah, silahkan cek di Google Calendar", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(context, "Maaf, data anak belum di penuhiii", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(context, "Maaf, data anak belum di penuhi", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        holder.viewRemindMe.setOnClickListener(view -> {
+//            if (!name.equals("admin")) {
+//                if (!rsName.equals("")) {
+//                    holder.addCalendar(
+//                            list_dataa.get(position).get("schedule_title"),
+//                            list_dataa.get(position).get("schedule_desc"),
+//                            rsName,
+//                            CalculateDateImmunization.startDate(Integer.parseInt(list_dataa.get(position).get("schedule_time")), tglLahir),
+//                            CalculateDateImmunization.endDate(Integer.parseInt(list_dataa.get(position).get("schedule_time")), tglLahir)
+//                    );
+//                    Log.d("startDate", CalculateDateImmunization.startDate(Integer.parseInt(list_dataa.get(position).get("schedule_time")), tglLahir));
+//                    Log.d("endDate", CalculateDateImmunization.endDate(Integer.parseInt(list_dataa.get(position).get("schedule_time")), tglLahir));
+//                    Toast.makeText(context, "Jadwal Sudah Ditambah, silahkan cek di Google Calendar", Toast.LENGTH_LONG).show();
+//                } else {
+//                    Toast.makeText(context, "Maaf, data anak belum di penuhiii", Toast.LENGTH_SHORT).show();
+//                }
+//            } else {
+//                Toast.makeText(context, "Maaf, data anak belum di penuhi", Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
     @Override
     public int getItemCount() {
-        return schedule.size();
+        return list_dataa.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -166,6 +166,7 @@ class AdapterImunisasi extends RecyclerView.Adapter<AdapterImunisasi.ViewHolder>
                 String reminderUriString = "content://com.android.calendar/reminders";
                 context.getContentResolver()
                         .insert(Uri.parse(reminderUriString), reminders);
+                Log.d("tes", String.valueOf(startDate.getTime()) + title);
             } catch (ParseException e) {
                 e.printStackTrace();
                 Log.d("date", e.getMessage());

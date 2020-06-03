@@ -1,11 +1,12 @@
 package com.titi.remotbayi.imunisasi;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -13,13 +14,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.titi.remotbayi.R;
-import com.titi.remotbayi.model.ApiClient;
-import com.titi.remotbayi.model.ApiInterface;
 import com.titi.remotbayi.model.ModelChild;
-import com.titi.remotbayi.model.PojoSchedule;
 import com.titi.remotbayi.sqlite.SqliteHandler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,9 +34,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ImunisasiActivity extends AppCompatActivity {
 
@@ -51,6 +54,10 @@ public class ImunisasiActivity extends AppCompatActivity {
     SwipeRefreshLayout swipe;
     Cursor cursor;
     protected List<ModelChild> data = new ArrayList<>();
+    ArrayList<HashMap<String, String>> list_dataa;
+    private RequestQueue requestQueue;
+    private StringRequest stringRequest;
+    public String url = "http://fikri.akudeveloper.com/getImmunization.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +71,6 @@ public class ImunisasiActivity extends AppCompatActivity {
         } else {
             fabAdd.setVisibility(View.GONE);
         }
-        getResponse();
         fabAdd.setOnClickListener(v -> {
             Intent i = new Intent(getApplicationContext(), AddImmunizationList.class);
             i.putExtra("id", "none");
@@ -108,29 +114,47 @@ public class ImunisasiActivity extends AppCompatActivity {
     }
 
     private void getResponse() {
-        ApiInterface interfaces = ApiClient.getClient().create(ApiInterface.class);
-        Call<PojoSchedule> call = interfaces.getSchedule();
-        call.enqueue(new Callback<PojoSchedule>() {
+        final ProgressDialog progres = new ProgressDialog(this);
+        progres.setTitle("Mohon tunggu sebentar");
+        progres.setMessage("Sedang Ambil Data");
+        progres.show();
+        requestQueue = Volley.newRequestQueue(ImunisasiActivity.this);
+        list_dataa = new ArrayList<>();
+        stringRequest = new StringRequest(Request.Method.POST, url, new com.android.volley.Response.Listener<String>() {
             @Override
-            public void onResponse(Call<PojoSchedule> call, Response<PojoSchedule> response) {
-                if (data.size() == 0) {
-                    adapter = new AdapterImunisasi(getApplicationContext(), response.body().getSchedule(), "", "", user.get("name"));
-                } else {
-                    String tglLahir = data.get(0).getTglLahir();
-                    String rsName = data.get(0).getRSName();
-                    adapter = new AdapterImunisasi(getApplicationContext(), response.body().getSchedule(), rsName, tglLahir, user.get("name"));
+            public void onResponse(String response) {
+                progres.dismiss();
+                Log.d("response ", response);
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("schedule");
+                    for (int a = 0; a < jsonArray.length(); a++) {
+                        JSONObject json = jsonArray.getJSONObject(a);
+                        HashMap<String, String> map = new HashMap<String, String>();
+                        map.put("schedule_id", json.getString("schedule_id"));
+                        map.put("schedule_title", json.getString("schedule_title"));
+                        map.put("schedule_desc", json.getString("schedule_desc"));
+                        map.put("schedule_time", json.getString("schedule_time"));
+                        map.put("bb_standart", json.getString("bb_standart"));
+                        map.put("tb_standart", json.getString("tb_standart"));
+                        map.put("st_standart", json.getString("st_standart"));
+                        list_dataa.add(map);
+                        if (data.size() == 0) {
+                            adapter = new AdapterImunisasi(getApplicationContext(), list_dataa, "", "", user.get("name"));
+                        } else {
+                            String tglLahir = data.get(0).getTglLahir();
+                            String rsName = data.get(0).getRSName();
+                            adapter = new AdapterImunisasi(getApplicationContext(), list_dataa, rsName, tglLahir, user.get("name"));
+                        }
+                        recImunisasi.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                        recImunisasi.setAdapter(adapter);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                recImunisasi.setHasFixedSize(true);
-                recImunisasi.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                recImunisasi.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onFailure(Call<PojoSchedule> call, Throwable t) {
-                Toast.makeText(ImunisasiActivity.this, "Maaf tidak ada data jadwal imunisasi", Toast.LENGTH_SHORT).show();
-            }
-        });
+            }}, error -> {
+            });
+        requestQueue.add(stringRequest);
     }
 
     @Override
